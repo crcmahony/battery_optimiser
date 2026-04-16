@@ -1,7 +1,7 @@
 import pandas as pd
 import pulp
 
-def battery_optimiser(hourly_prices, max_charging_rate, max_discharging_rate, max_storage_volume, charging_efficiency, discharging_efficiency, initial_soc, solver=pulp.PULP_CBC_CMD(msg=0)):
+def battery_optimiser(hourly_prices, max_charging_rate=2, max_discharging_rate=2, max_storage_volume=4, charging_efficiency=0.05, discharging_efficiency=0.05, initial_soc=0.0, solver=pulp.PULP_CBC_CMD(msg=0)):
     
     model = pulp.LpProblem("battery_optimisation", pulp.LpMaximize)
     
@@ -18,6 +18,10 @@ def battery_optimiser(hourly_prices, max_charging_rate, max_discharging_rate, ma
 
     model.solve(solver)
 
+    status = pulp.LpStatus[model.status]
+    if status != "Optimal":
+        raise RuntimeError(f"Solver didn't find optimal solution. Status:{status}")
+
     schedule = pd.DataFrame({"price": hourly_prices,
                              "charge": [charge[t].varValue for t in range(n_hours)],
                              "discharge": [discharge[t].varValue for t in range(n_hours)],
@@ -25,4 +29,4 @@ def battery_optimiser(hourly_prices, max_charging_rate, max_discharging_rate, ma
     
     profit = pulp.value(model.objective)
 
-    return pulp.LpStatus[model.status], schedule, profit
+    return schedule, profit
