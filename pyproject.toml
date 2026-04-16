@@ -1,0 +1,14 @@
+[project]
+name = "battery-optimiser"
+version = "0.1.0"
+description = "Battery charging and discharging to optimise profits"
+requires-python = ">=3.12"
+dependencies = [
+    "pulp",
+    "pandas",
+    "openpyxl",
+]
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
