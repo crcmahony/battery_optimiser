@@ -1,13 +1,14 @@
 import pandas as pd
 import pulp
 
-def battery_optimiser(hourly_prices, max_charging_rate=2, max_discharging_rate=2, max_storage_volume=4, charging_efficiency=0.05, discharging_efficiency=0.05, initial_soc=0.0, solver=pulp.PULP_CBC_CMD(msg=0)):
+def battery_optimiser(hourly_prices, max_charging_rate=2, max_discharging_rate=2, max_storage_volume=4, charging_efficiency=0.05, discharging_efficiency=0.05, initial_soc=0.0, solver=None):
     """
     Maximise profit from battery charging and discharging via linear programming.
-    
+
     Returns (schedule DataFrame, total profit).
     Raises RuntimeError if no optimal solution is found 
     """
+    solver = solver or pulp.PULP_CBC_CMD(msg=0)
     model = pulp.LpProblem("battery_optimisation", pulp.LpMaximize)
     
     #Decision variables: charge, discharge, and state of charge each hour
